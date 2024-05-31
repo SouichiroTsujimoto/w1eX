@@ -23,18 +23,20 @@ async function saveFile(data: string): Promise<void> {
 }
 // パーサーの定義
 const parser = P.createLanguage({
-    Expression: (r) => P.alt(r.DollarExpression, r.SharpExpression, r.Text).many().tieWith(""),
-    Text: () => P.regex(/[^$\#]+/), // `$`以外の任意の文字列
-    // Text: () => P.any.many().tie(),
-    SharpExpression: () => P.seq(
-        P.regexp(/\#+/),
-        P.regexp(/[^\n]/)
-    ).map(([start, content]) => `\\(${content}\\)`),
+    Expression: (r) => P.alt(r.Text, r.SharpExpression).many().tieWith(""),
+    Text: (r) => P.alt(P.regex(/[^\$\#\n\r]+/), r.DollarExpression, r.NewLine), 
+    NewLine: () => P.regexp(/[\n\r]/).map((nr) => '<br>'),
+    SharpExpression: (r) => P.seq(
+        P.regexp(/\#+[\s]*/),
+        P.regexp(/[^\n\r]+/),
+        P.newline,
+        r.Text.many().tieWith(""),
+    ).map(([start, title, nl, content]) => `<h3>${title}</h3>\n<p>${content}</p>\n`),
     DollarExpression: () => P.seq(
         P.string('$['),
         P.regexp(/[^\]]*/), // `]` 以外の任意の文字列
-        P.string(']')
-    ).map(([start, content, end]) => `\\(${content}\\)`)
+        P.string(']'),
+    ).map(([start, content, end]) => `\\(${content}\\)`),
     });
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
@@ -44,7 +46,7 @@ function transform(input: string): string {
         console.log(result);
         return result.value;
     } else {
-        throw new Error(`Parsing failed: ${result.expected}, ${result.index.offset}`);
+        throw new Error(`Parsing failed: ${result.expected} | ${result.index.offset}`);
     }
 }
 
@@ -57,15 +59,19 @@ loadFile().then((source) => {
 
 
 
-    let data = 
-    `
-    <head>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    </head>
-    <body>
-        <p>${transformedString}</p>
-    </body>
-    `;
+    let data = `
+<head>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+p {
+margin-left: 2em;
+}
+</style>
+</head>
+<body>
+${transformedString}
+</body>
+`;
 
     saveFile(data);
 
