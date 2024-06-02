@@ -21,6 +21,9 @@ async function saveFile(data: string): Promise<void> {
         console.error("ファイルの書き込みに失敗しました:", error);
     }
 }
+
+let count = 0;
+
 // パーサーの定義
 const parser = P.createLanguage({
     Note: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
@@ -32,25 +35,29 @@ const parser = P.createLanguage({
     ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
     ExclamationExpression: (r) => P.alt(r.DefBox), 
     DefBox: (r) => P.seq(
-        P.regexp(/\!def\s*\(/),
-        P.regexp(/[^\)]*/),
-        P.regexp(/\)(\r*\n*)*/),
-        P.regexp(/\{(\r*\n*)?/),
+        P.regexp(/\!def\s*\:?/),
+        P.regexp(/[^\{]*/),
+        P.regexp(/\s*\{(\r*\n*)?/),
         r.Text.many().tieWith(""),
         P.string('}'),
-    ).map(([def, arg, rp, lc, content, rc]) => `<b id="${arg}">定義(${arg})</b>\n<div class="box">${content}</div>`),
+    ).map(([def, id, lc, content, rc]) =>
+        `<div class="box">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="marker">定義${id!="" ? " " + id.trim() : ""}</span></b><br><br>\n${content}</div>`),
     SharpExpression: (r) => P.seq(
-        P.regexp(/\#\s*\{\s*/),
-        P.regexp(/[^\n\r]+/),
-        P.newline,
+        P.regexp(/\#\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        P.regexp(/\s*\{\s*/),
         r.Note,
         P.string('}'),
-    ).map(([start, title, nl, content, rb]) => `<h3>${title}</h3><div class=box>\n${content}\n</div>`),
+    ).map(([start, title, colon, id, lb, content, rb]) =>
+        `<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}>${id.trim()!="" ? id.trim() + " " : ""} ${title}</b><div class="section">\n${content}\n</div>`),
     DollarExpression: () => P.seq(
-        P.regexp(/\$\s*\[/),
+        P.regexp(/\$\s*\[\s*/),
         P.regexp(/[^\]]*/), // `]` 以外の任意の文字列
         P.string(']'),
-    ).map(([start, content, end]) => `\\(${content}\\)`),
+    ).map(([start, content, end]) => 
+        `\\(${content}\\)`),
     });
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
@@ -72,8 +79,36 @@ loadFile().then((source) => {
 <head>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
+body{
+font-family: "Hiragino Sans";
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+border-radius: 10px;
+margin: 16px;
+padding: 16px;
+}
+.section {
+font-size:16px;
+line-height:100%; 
+background-color: white;
+// box-shadow: rgba(99, 99, 99, 0.2) 0px 1px 10px 0px;
+// box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+border-radius: 5px;
+padding-top: 10px;
+padding-left: 14px;
+}
 .box {
-margin-left: 2em;
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+// box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
+span.marker {
+    background: linear-gradient(transparent 40%, #a5dee5 40% 80%, transparent 80%);
 }
 </style>
 </head>
