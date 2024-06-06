@@ -6,6 +6,10 @@
   "engines": {
     "vscode": "^1.80.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SouichiroTsujimoto/w1eX.git"
+  },
   "categories": [
     "Other"
   ],
@@ -33,6 +37,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/parsimmon": "^1.10.9",
     "@types/vscode": "^1.80.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
@@ -42,6 +47,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "w1ex-core": "file:w1ex-core"
+    "parsimmon": "^1.18.1"
   }
 }

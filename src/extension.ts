@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {compile} from 'w1ex-core';
+import {compile} from './w1ex';
 
 export function activate(context: vscode.ExtensionContext) {
 	const panel = vscode.window.createWebviewPanel(
