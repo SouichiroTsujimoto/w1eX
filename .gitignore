@@ -76,4 +76,4 @@ tsconfig.lsif.json
 *.db
 lib
 out
-.vsix
+*.vsix
