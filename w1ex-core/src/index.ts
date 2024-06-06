@@ -86,10 +86,10 @@ const parser = P.createLanguage({
         P.string(')'),
     ).map(([lp, id, rp]) => {
             let content = "";
-            if(mathLabels.hasOwnProperty(id)){
-                content = mathLabels[id];
+            if(mathLabels.hasOwnProperty(id.trim())){
+                content = mathLabels[id.trim()];
             }else {
-                content = `undefined label: ${id}`;
+                content = `undefined label: ${id.trim()}`;
             }
             return `${content}`
         }),
@@ -142,6 +142,7 @@ font-size:16px;
 line-height:100%;
 box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 margin-top: 7px;
+margin-bottom: 3.5px;
 border-radius: 5px;
 padding: 14px;
 }
