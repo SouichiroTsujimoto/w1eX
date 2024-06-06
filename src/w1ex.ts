@@ -34,7 +34,7 @@ const parser = P.createLanguage({
         P.string('@'),
         P.regexp(/[^\s]+/),
     ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
-    ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox), 
+    ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox, r.TheBox, r.ProBox, r.LemBox, r.AxiBox, r.CorBox), 
     DefBox: (r) => P.seq(
         P.regexp(/\!def\s*/),
         P.regexp(/[^\{\:]*/),
@@ -42,14 +42,56 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${name.trim()} ${id!="" ? " " + id.trim() : ""}</b><br><br>${content}</div>`),
+        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),
     ExpBox: (r) => P.seq(
         P.regexp(/\!exp\s*\:?/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
         r.CurlyBracesTexts, // できれば任意にしたい
-    ).map(([exp, id, content1, content2]) =>
-        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題${id!="" ? " " + id.trim() : ""}</span></b><br><br>${content1}<br><details><summary>解答</summary>${content2}</details></div>`),
+    ).map(([exp, name, colon, id, content1, content2]) =>
+        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題</span> ${name.trim()} ${id.trim()}</b><br><br>${content1}<br><details><summary>解答</summary>${content2}</details></div>`),
+    TheBox: (r) => P.seq(
+        P.regexp(/\!the\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="TheBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="TheMarker">定理</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),
+    ProBox: (r) => P.seq(
+        P.regexp(/\!pro\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="ProBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ProMarker">命題</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+    LemBox: (r) => P.seq(
+        P.regexp(/\!lem\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="LemBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="LemMarker">補題</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+    AxiBox: (r) => P.seq(
+        P.regexp(/\!axi\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="AxiBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="AxiMarker">公理</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+    CorBox: (r) => P.seq(
+        P.regexp(/\!cor\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="CorBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="CorMarker">系</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
     SharpExpression: (r) => P.seq(
         P.regexp(/\#\s*/),
         P.regexp(/[^\{\:]*/),
@@ -153,11 +195,66 @@ margin-top: 7px;
 border-radius: 5px;
 padding: 14px;
 }
+.TheBox {
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
+.ProBox {
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
+.LemBox {
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
+.AxiBox {
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
+.CorBox {
+font-size:16px;
+line-height:100%;
+box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+margin-top: 7px;
+border-radius: 5px;
+padding: 14px;
+}
 span.DefMarker {
 background: linear-gradient(transparent 50%, #a5dee5 50% 100%);
 }
 span.ExpMarker {
 background: linear-gradient(transparent 50%, #fff57d 50% 100%);
+}
+span.TheMarker {
+background: linear-gradient(transparent 50%, #e2c6ff 50% 100%);
+}
+span.ProMarker {
+background: linear-gradient(transparent 50%, #fdB86d 50% 100%);
+}
+span.LemMarker {
+background: linear-gradient(transparent 50%, #98fb98 50% 100%);
+}
+span.AxiMarker {
+background: linear-gradient(transparent 50%, #ff6961 50% 100%);
+}
+span.CorMarker {
+background: linear-gradient(transparent 50%, #6688cc 50% 100%);
 }
 </style>
 </head>
