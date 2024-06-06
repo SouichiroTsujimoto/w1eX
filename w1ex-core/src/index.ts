@@ -23,10 +23,11 @@ async function saveFile(data: string, outpath: string): Promise<void> {
 }
 
 let count = 0;
+let mathLabels: { [key: string]: string; } = {};
 
 // パーサーの定義
 const parser = P.createLanguage({
-    Note: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
+    Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
     Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\]]+/), r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
     NewLine: () => P.regexp(/[\n\r]/).map((nr) => '<br>\n'),
     AtSignExpression: () => P.seq(
@@ -54,30 +55,51 @@ const parser = P.createLanguage({
         P.regexp(/[^\{\:]*/),
         P.regexp(/\:?/),
         P.regexp(/[^\{]*/),
-        r.CurlyBracesNote
-    ).map(([start, title, colon, id, cbnote]) =>
-        `<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}>${id.trim()!="" ? id.trim() + " " : ""} ${title}</b>${cbnote}`),
+        r.CurlyBracesSentence
+    ).map(([start, title, colon, id, cbsentence]) =>
+        `<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}>${id.trim()!="" ? id.trim() + " " : ""} ${title}</b>${cbsentence}`),
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Text.many().tieWith(""),
-        P.string('}'),
+        P.regexp(/\s*\}\s*/),
     ).map(([lc, content, rc]) => `\n${content}\n`),
-    CurlyBracesNote: (r) => P.seq(
+    CurlyBracesSentence: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
-        r.Note,
-        P.string('}'),
+        r.Sentence,
+        P.regexp(/\s*\}\s*/),
     ).map(([lc, content, rc]) => `<div class="section">\n${content}\n</div>`),
-    DollarExpression: () => P.seq(
+    DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
+    MathExpression: () => P.seq(
         P.regexp(/\$\s*\[\s*/),
-        P.regexp(/[^\]]*/), // `]` 以外の任意の文字列
+        P.regexp(/[^\]]*/),
         P.string(']'),
-    ).map(([start, content, end]) => 
-        `\\(${content}\\)`),
+        P.regexp(/(\s*\:\s*[^\s]+)?/),
+    ).map(([start, content, end, id]) => {
+            if(id != ""){
+                mathLabels[id.trim().slice(1).trim()] = `\\(${content}\\)`;
+            }
+            return `\\(${content}\\)`;
+        }),
+    MathLabel: (r) => P.seq(
+        P.regexp(/\$\s*\(\s*/),
+        P.regexp(/[^\)]*/),
+        P.string(')'),
+    ).map(([lp, id, rp]) => {
+            let content = "";
+            if(mathLabels.hasOwnProperty(id)){
+                content = mathLabels[id];
+            }else {
+                content = `undefined label: ${id}`;
+            }
+            return `${content}`
+        }),
     });
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
 function transform(input: string): string {
-    const result = parser.Note.parse(input);
+    const result = parser.Sentence.parse(input);
+    
+    console.log(result);
     if (result.status) {
         console.log(result);
         return result.value;
