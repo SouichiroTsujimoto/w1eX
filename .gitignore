@@ -74,3 +74,5 @@ typings/
 tsconfig.lsif.json
 *.lsif
 *.db
+lib
+out

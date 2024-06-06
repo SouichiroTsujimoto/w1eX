@@ -61,12 +61,12 @@ const parser = P.createLanguage({
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Text.many().tieWith(""),
-        P.regexp(/\s*\}\s*/),
+        P.regexp(/\s*\}/),
     ).map(([lc, content, rc]) => `\n${content}\n`),
     CurlyBracesSentence: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Sentence,
-        P.regexp(/\s*\}\s*/),
+        P.regexp(/\s*\}/),
     ).map(([lc, content, rc]) => `<div class="section">\n${content}\n</div>`),
     DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
     MathExpression: () => P.seq(
@@ -142,7 +142,6 @@ font-size:16px;
 line-height:100%;
 box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 margin-top: 7px;
-margin-bottom: 3.5px;
 border-radius: 5px;
 padding: 14px;
 }
