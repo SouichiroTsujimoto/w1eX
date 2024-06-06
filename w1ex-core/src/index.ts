@@ -1,24 +1,24 @@
 import { readFile, writeFile } from "fs/promises";
 import * as P from 'parsimmon';
 
-async function loadFile(): Promise<string> {
+async function loadFile(filepath: string): Promise<string> {
     let source: string = "";
     try {
-        source = await readFile("./src/index.w1ex", "utf8");
+        source = await readFile(filepath, "utf8");
         console.log(source);
     } catch (error) {
-        console.error("ファイルの読み込みに失敗しました:", error);
+        throw new Error("ファイルの読み込みに失敗しました:" + error);
     }
     
     return source;
 }
 
-async function saveFile(data: string): Promise<void> {
+async function saveFile(data: string, outpath: string): Promise<void> {
     try {
-        await writeFile("./src/index.html", data, "utf8");
+        await writeFile(outpath, data, "utf8");
         console.log("ファイルが正常に書き込まれました。");
     } catch (error) {
-        console.error("ファイルの書き込みに失敗しました:", error);
+        throw new Error("ファイルの読み込みに失敗しました:" + error);
     }
 }
 
@@ -35,11 +35,13 @@ const parser = P.createLanguage({
     ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
     ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox), 
     DefBox: (r) => P.seq(
-        P.regexp(/\!def\s*\:?/),
+        P.regexp(/\!def\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
-    ).map(([def, id, content]) =>
-        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義${id!="" ? " " + id.trim() : ""}</span></b><br><br>${content}</div>`),
+    ).map(([def, name, colon, id, content]) =>
+        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${name.trim()} ${id!="" ? " " + id.trim() : ""}</b><br><br>${content}</div>`),
     ExpBox: (r) => P.seq(
         P.regexp(/\!exp\s*\:?/),
         P.regexp(/[^\{]*/),
@@ -85,11 +87,12 @@ function transform(input: string): string {
     }
 }
 
-loadFile().then((source) => { 
-    const transformedString = transform(source);
-    console.log(transformedString);
-
-    let data = `
+export async function compile(filepath: string): Promise<string> {
+    return loadFile(filepath).then((source) => { 
+        const transformedString = transform(source);
+        console.log(transformedString);
+    
+        let data = `
 <head>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
@@ -139,10 +142,15 @@ background: linear-gradient(transparent 50%, #fff57d 50% 100%);
 <body>
 ${transformedString}
 </body>
-`;
+`
+        // saveFile(data, outpath); //後でhtml出力verも作る
+        return data;
+    },
+    (err) => {
+        return err;
+    });
+}
 
-    saveFile(data);
-
-});
-
+// console.log(compile("/Users/tsujimoto_souichirou/Documents/w1eX/src/index.w1ex"));
+// saveFile(compile("/Users/tsujimoto_souichirou/Documents/w1eX/src/index.w1ex"), "src/index.html");
 

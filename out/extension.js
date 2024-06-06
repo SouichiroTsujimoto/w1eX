@@ -24,18 +24,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(require("vscode"));
-// import { readFile, writeFile } from "fs/promises";
-// import * as P from 'parsimmon';
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const w1ex_core_1 = require("w1ex-core");
 function activate(context) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "w1eX" is now active!');
-    const createMemoFileCommand = vscode.commands.registerCommand('w1eX.start', async () => {
+    const panel = vscode.window.createWebviewPanel('openPreview', 'Preview test', vscode.ViewColumn.Two, { enableScripts: true });
+    const w1eXCompile = vscode.commands.registerCommand('w1eX.compile', async () => {
         // VSCodeで開いているディレクトリを取得
         // 開いていない場合はエラーを出して終了する
         const folders = vscode.workspace.workspaceFolders;
@@ -46,23 +39,38 @@ function activate(context) {
         const folderPath = folders[0].uri;
         // ファイル名入力
         const inputName = await vscode.window.showInputBox();
+        if (inputName == undefined) {
+            vscode.window.showErrorMessage('Error: inputName undefined');
+            return;
+        }
         // ファイル名構築
         // フォーマットは YYYYMMDD_入力した文字列.md とする
-        const date = new Date();
-        const fileName = `${inputName}.w1eX`;
+        // const date = new Date();
+        const outputName = `${inputName}.html`;
         // 書き込むファイルのフルパスを生成
-        const fullUri = vscode.Uri.joinPath(folderPath, fileName);
-        // 書き込むファイルの内容を準備
-        // Uint8Arrayに変換する
-        const content = `# ${inputName}`;
-        const blob = Buffer.from(content);
+        const inputUri = vscode.Uri.joinPath(folderPath, inputName);
+        const outputUri = vscode.Uri.joinPath(folderPath, outputName);
+        // // 書き込むファイルの内容を準備
+        // // Uint8Arrayに変換する
+        // const content = `# ${inputName}`;
+        // const blob: Uint8Array = Buffer.from(content);
         // ファイル書き込み
-        await vscode.workspace.fs.writeFile(fullUri, blob);
+        (0, w1ex_core_1.compile)(inputUri.path).then(html => {
+            vscode.workspace.fs.writeFile(outputUri, Buffer.from(html));
+        }, err => {
+            console.error(err);
+        });
     });
-    context.subscriptions.push(createMemoFileCommand);
+    const didChange = vscode.workspace.onDidSaveTextDocument(event => {
+        vscode.window.showInformationMessage(event.uri.path);
+        (0, w1ex_core_1.compile)(event.uri.path).then(html => {
+            panel.webview.html = html;
+        }, err => {
+            console.error(err);
+        });
+    });
 }
 exports.activate = activate;
-// This method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map

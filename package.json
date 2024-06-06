@@ -1,25 +1,47 @@
 {
   "name": "w1ex",
-  "version": "1.0.0",
+  "displayName": "w1eX",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "npm run build:live",
-    "build": "tsc -p .",
-    "build:live": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "w1eX.new",
+        "title": "create new w1eX file",
+        "category": "w1eX"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "@types/parsimmon": "^1.10.9",
-    "nodemon": "^3.1.1",
-    "ts-node": "^10.9.2",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "parsimmon": "^1.18.1"
+    "w1ex-core": "file:w1ex-core"
   }
 }
