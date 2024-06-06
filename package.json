@@ -20,8 +20,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "w1eX.new",
-        "title": "create new w1eX file",
+        "command": "w1eX.compile",
+        "title": "create html file",
         "category": "w1eX"
       }
     ]

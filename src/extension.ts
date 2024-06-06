@@ -50,15 +50,17 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	const didChange = vscode.workspace.onDidSaveTextDocument(event => {
-		vscode.window.showInformationMessage(event.uri.path);
-		compile(event.uri.path).then(
-			html => {
-				panel.webview.html = html;
-			},
-			err => {
-				console.error(err);
-			}
-		);
+		if(/\.w1ex$/.test(event.uri.path)) {
+			vscode.window.showInformationMessage(event.uri.path);
+			compile(event.uri.path).then(
+				html => {
+					panel.webview.html = html;
+				},
+				err => {
+					console.error(err);
+				}
+			);
+		}
 	});
 }
 
