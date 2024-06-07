@@ -17,7 +17,46 @@ Preview画面を消してしまった場合、`w1eX.reopenView`を実行する�
 
 ## 文法
 
-<html>
+### 章
+```
+# 商の名前 : 1. {
+    ここに文章を記述
+}
+```
+__出力__
+
+<b id="1.">1.  章の名前 </b><div class="section">ここに文章を記述</div><br>
+
+### 定義、定理、命題、補題、公理、系
+```
+!def {
+    数式は$[\LaTeX] : latex で記述できます
+}
+!the : 1.2 {
+    ラベルを利用することで、登録した$(latex)の式を再利用できます
+}
+!pro (命題の名前) {
+    ...
+    !lem 補題の名前 : 1.2.3 {
+        ...
+    }
+}
+!axi {
+    ...
+}
+!cor {
+    ...
+}
+!exp {
+    ...
+}{
+    ...
+}
+```
+
+__出力__
+<foreignObject width="100%" height="100%">
+
 <style>
 body{
 line-break: anywhere;
@@ -116,46 +155,7 @@ span.CorMarker {
 background: linear-gradient(transparent 50%, #6688cc 50% 100%);
 }
 </style>
-</html>
 
-### 章
-```
-# 商の名前 : 1. {
-    ここに文章を記述
-}
-```
-__出力__
-
-<b id="1.">1.  章の名前 </b><div class="section">ここに文章を記述</div><br>
-
-### 定義、定理、命題、補題、公理、系
-```
-!def {
-    数式は$[\LaTeX] : latex で記述できます
-}
-!the : 1.2 {
-    ラベルを利用することで、登録した$(latex)の式を再利用できます
-}
-!pro (命題の名前) {
-    ...
-    !lem 補題の名前 : 1.2.3 {
-        ...
-    }
-}
-!axi {
-    ...
-}
-!cor {
-    ...
-}
-!exp {
-    ...
-}{
-    ...
-}
-```
-
-__出力__
 
 <div class="DefBox">
 <b><span class="DefMarker">定義</span>  </b><br><br>
@@ -186,6 +186,8 @@ __出力__
 <b id="id >"><span class="CorMarker">系</span></b><br><br>
 ...<br>
 </div><br>
+
+</foreignObject>
 
 ### 例題
 後半の{ }内は解答
