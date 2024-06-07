@@ -4,6 +4,9 @@
 
 具体的な使用例は`/sample`内のファイルを参照してください。
 
+<img width="1449" alt="スクリーンショット 2024-06-07 22 47 20" src="https://github.com/SouichiroTsujimoto/w1eX/assets/40849683/a87409bc-441a-41ff-93df-4efbd1dbdfe7">
+
+
 ## インストール
 vscodeの拡張機能として公開しています。
 https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
