@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import {compile} from './w1ex';
+import { stringify } from 'querystring';
 
 export function activate(context: vscode.ExtensionContext) {
 	let panel = vscode.window.createWebviewPanel(
@@ -19,30 +20,40 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	const w1eXCompile = vscode.commands.registerCommand('w1eX.compile', async () => {
-		// VSCodeで開いているディレクトリを取得
-		// 開いていない場合はエラーを出して終了する
-		const folders = vscode.workspace.workspaceFolders;
-		if (folders === undefined) {
-			vscode.window.showErrorMessage('Error: Open the folder before executing this command.');
+		// // VSCodeで開いているディレクトリを取得
+		// // 開いていない場合はエラーを出して終了する
+		// const folders = vscode.workspace.workspaceFolders;
+		// if (folders === undefined) {
+		// 	vscode.window.showErrorMessage('Error: Open the folder before executing this command.');
+		// 	return;
+		// }
+		// const folderPath = folders[0].uri;
+		const filePath = await vscode.window.showOpenDialog({
+			canSelectFiles: true, // ファイルの選択を有効にする
+			canSelectFolders: false, // フォルダーの選択を無効にする
+			canSelectMany: false, // 複数のファイルの選択を無効にする
+			openLabel: 'Select' // ボタンのラベル
+		});
+	
+		if (filePath && filePath.length > 0) {
+			// ファイルが選択された場合の処理
+			vscode.window.showInformationMessage(`Selected file: ${filePath[0].path}`);
+		} else {
+			// ファイルが選択されなかった場合の処理
+			vscode.window.showWarningMessage('No file selected.');
 			return;
 		}
-		const folderPath = folders[0].uri;
 
-		// ファイル名入力
-		const inputName = await vscode.window.showInputBox();
-		if(inputName == undefined){
-			vscode.window.showErrorMessage('Error: inputName undefined');
-			return;
-		}
-
+		
 		// ファイル名構築
 		// フォーマットは YYYYMMDD_入力した文字列.md とする
 		// const date = new Date();
-		const outputName = `${inputName}.html`;
+		const outputName = (filePath[0].path===undefined ? "" : filePath[0].path) + ".html";
+		const outputPath = vscode.Uri.file(outputName);
 
-		// 書き込むファイルのフルパスを生成
-		const inputUri = vscode.Uri.joinPath(folderPath, inputName);
-		const outputUri = vscode.Uri.joinPath(folderPath, outputName);
+		// // 書き込むファイルのフルパスを生成
+		// const inputUri = vscode.Uri.joinPath(folderPath, inputName);
+		// const outputUri = vscode.Uri.joinPath(folderPath, outputName);
 
 		// // 書き込むファイルの内容を準備
 		// // Uint8Arrayに変換する
@@ -50,11 +61,14 @@ export function activate(context: vscode.ExtensionContext) {
 		// const blob: Uint8Array = Buffer.from(content);
 
 		// ファイル書き込み
-		compile(inputUri.path).then(html => {
-			vscode.workspace.fs.writeFile(outputUri, Buffer.from(html));
+		compile(filePath[0].fsPath).then(html => {
+			console.log(html);
+			vscode.workspace.fs.writeFile(outputPath, Buffer.from(html));
+			vscode.window.showInformationMessage("compile success");
 		},
 		err => {
 			console.error(err);
+			vscode.window.showErrorMessage("compile fail");
 		});
 	});
 
@@ -75,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			
 			// vscode.window.showInformationMessage(event.uri.path);
-			compile(event.uri.path).then(
+			compile(event.uri.fsPath).then(
 				html => {
 					panel.webview.html = html;
 				},

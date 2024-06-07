@@ -1,10 +1,13 @@
-import { readFile, writeFile } from "fs/promises";
+import { readFileSync, writeFileSync } from "fs";
+import path from "path";
 import * as P from 'parsimmon';
 
 async function loadFile(filepath: string): Promise<string> {
     let source: string = "";
+    // let rf = path.relative(__dirname, filepath);
+    // console.log(rf);
     try {
-        source = await readFile(filepath, "utf8");
+        source = readFileSync(filepath, "utf8");
         console.log(source);
     } catch (error) {
         throw new Error("ファイルの読み込みに失敗しました:" + error);
@@ -15,7 +18,7 @@ async function loadFile(filepath: string): Promise<string> {
 
 async function saveFile(data: string, outpath: string): Promise<void> {
     try {
-        await writeFile(outpath, data, "utf8");
+        await writeFileSync(outpath, data, "utf8");
         console.log("ファイルが正常に書き込まれました。");
     } catch (error) {
         throw new Error("ファイルの読み込みに失敗しました:" + error);
