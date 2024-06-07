@@ -17,7 +17,8 @@ Preview画面を消してしまった場合、`w1eX.reopenView`を実行する�
 
 ## 文法
 
-&lt;style&gt;
+<html>
+<style>
 body{
 line-break: anywhere;
 background-color: white;
@@ -114,8 +115,8 @@ background: linear-gradient(transparent 50%, #ff6961 50% 100%);
 span.CorMarker {
 background: linear-gradient(transparent 50%, #6688cc 50% 100%);
 }
-&lt;/style&gt;
-
+</style>
+</html>
 
 ### 章
 ```
