@@ -11,9 +11,10 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 ## 使い方
 拡張子`.w1ex`のファイルを編集すると、Previewが表示されます。
 
-また、コマンドパレットで`w1eX.compile`を実行し編集したw1exファイルの名前を入力すると、htmlファイルが出力されます。
+コマンドパレットから以下のコマンドが呼び出せます。
++ `w1eX.compile` : 選択した`.w1ex`ファイルをhtmlにコンパイル
 
-Preview画面を消してしまった場合、`w1eX.reopenView`を実行することで再表示させることができます。
++ `w1eX.reopenView` : 閉じてしまったPreviewを再表示
 
 ## 文法
 
