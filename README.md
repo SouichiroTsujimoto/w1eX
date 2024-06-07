@@ -4,6 +4,10 @@
 
 具体的な使用例は`/sample`内のファイルを参照してください。
 
+## インストール
+vscodeの拡張機能として公開しています。
+https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
+
 ## 使い方
 拡張子`.w1ex`のファイルを編集すると、Previewが表示されます。
 
