@@ -2,13 +2,13 @@ import * as vscode from 'vscode';
 import {compile} from './w1ex';
 
 export function activate(context: vscode.ExtensionContext) {
-	const panel = vscode.window.createWebviewPanel(
+	let panel = vscode.window.createWebviewPanel(
 		'openPreview',
-		'Preview test',
+		'w1eX preview test',
 		vscode.ViewColumn.Two,
 		{enableScripts: true}
 	);
-
+	
 	const w1eXCompile = vscode.commands.registerCommand('w1eX.compile', async () => {
 		// VSCodeで開いているディレクトリを取得
 		// 開いていない場合はエラーを出して終了する
@@ -49,9 +49,21 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
+	let reOpenPanel = false;
+
 	const didChange = vscode.workspace.onDidSaveTextDocument(event => {
 		if(/\.w1ex$/.test(event.uri.path)) {
-			vscode.window.showInformationMessage(event.uri.path);
+			if(reOpenPanel) {
+				panel = vscode.window.createWebviewPanel(
+					'openPreview',
+					'w1eX preview test',
+					vscode.ViewColumn.Two,
+					{enableScripts: true}
+				);
+				reOpenPanel = false;
+			}
+			
+			// vscode.window.showInformationMessage(event.uri.path);
 			compile(event.uri.path).then(
 				html => {
 					panel.webview.html = html;
@@ -62,6 +74,14 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 		}
 	});
+
+	panel.onDidDispose(
+		() => {
+			reOpenPanel = true;
+		},
+		null,
+        context.subscriptions
+	);
 }
 
 
