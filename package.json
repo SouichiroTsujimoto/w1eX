@@ -2,7 +2,7 @@
   "name": "w1ex",
   "displayName": "w1eX",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -23,6 +23,11 @@
       {
         "command": "w1eX.compile",
         "title": "create html file",
+        "category": "w1eX"
+      },
+      {
+        "command": "w1eX.reopenView",
+        "title": "reopen html view",
         "category": "w1eX"
       }
     ]

@@ -8,7 +8,16 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.ViewColumn.Two,
 		{enableScripts: true}
 	);
-	
+
+	const reOpenView = vscode.commands.registerCommand('w1eX.reopenView', async () => {
+		panel = vscode.window.createWebviewPanel(
+			'openPreview',
+			'w1eX preview test',
+			vscode.ViewColumn.Two,
+			{enableScripts: true}
+		);
+	});
+
 	const w1eXCompile = vscode.commands.registerCommand('w1eX.compile', async () => {
 		// VSCodeで開いているディレクトリを取得
 		// 開いていない場合はエラーを出して終了する
@@ -48,6 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
 			console.error(err);
 		});
 	});
+
+	context.subscriptions.push(reOpenView, w1eXCompile);
 
 	let reOpenPanel = false;
 
