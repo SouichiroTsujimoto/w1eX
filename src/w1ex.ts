@@ -31,7 +31,7 @@ let mathLabels: { [key: string]: string; } = {};
 // パーサーの定義
 const parser = P.createLanguage({
     Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
-    Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\]]+/), r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
+    Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\[\]]+/), r.BracesSentence, r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
     NewLine: () => P.regexp(/[\n\r]/).map((nr) => '<br>\n'),
     AtSignExpression: () => P.seq(
         P.string('@'),
@@ -103,6 +103,11 @@ const parser = P.createLanguage({
         r.CurlyBracesSentence
     ).map(([start, title, colon, id, cbsentence]) =>
         `<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}>${id.trim()!="" ? id.trim() + " " : ""} ${title}</b>${cbsentence}`),
+    BracesSentence: (r) => P.seq(
+        P.regexp(/\s*\[\s*/),
+        r.w1eXMathExpression,
+        P.regexp(/\s*\]\s*/),
+    ).map(([lb, content, rb]) => `\n<math>${content}</math>\n`),
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Text.many().tieWith(""),
@@ -120,25 +125,45 @@ const parser = P.createLanguage({
         P.string(']'),
         P.regexp(/(\s*\:\s*[^\s]+)?/),
     ).map(([start, content, end, id]) => {
-            if(id != ""){
-                mathLabels[id.trim().slice(1).trim()] = `\\(${content}\\)`;
-            }
-            return `\\(${content}\\)`;
-        }),
+        if(id != ""){
+            mathLabels[id.trim().slice(1).trim()] = `\\(${content}\\)`;
+        }
+        return `\\(${content}\\)`;
+    }),
     MathLabel: (r) => P.seq(
         P.regexp(/\$\s*\(\s*/),
         P.regexp(/[^\)]*/),
         P.string(')'),
     ).map(([lp, id, rp]) => {
-            let content = "";
-            if(mathLabels.hasOwnProperty(id.trim())){
-                content = mathLabels[id.trim()];
-            }else {
-                content = `undefined label: ${id.trim()}`;
-            }
-            return `${content}`
-        }),
-    });
+        let content = "";
+        if(mathLabels.hasOwnProperty(id.trim())){
+            content = mathLabels[id.trim()];
+        }else {
+            content = `undefined label: ${id.trim()}`;
+        }
+        return `${content}`
+    }),
+    w1eXMathExpression: (r) => P.seq(
+        r.Number,
+        P.alt(
+            r.DivideExpression,
+            r.MultiExpression,
+        ),
+        P.alt(
+            r.w1eXMathExpression,
+            r.Number,
+        ),
+    ).map(([child, op, parent]) => {
+        if(op.trim() == "/"){
+            return `<mfrac><mn>${child}</mn><mrow><mn>${parent}</mn></mrow></mfrac>`
+        }else {
+            return `<mn>${child}</mn><mo>&times;</mo><mn>${parent}</mn>`
+        }
+    }), // 工事中
+    DivideExpression: (r) => P.regexp(/\s*\/\s*/),
+    MultiExpression: (r) => P.regexp(/\s*\*\s*/),
+    Number: () => P.regexp(/[0-9]+/),
+});
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
 function transform(input: string): string {
