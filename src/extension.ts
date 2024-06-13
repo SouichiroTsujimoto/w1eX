@@ -5,7 +5,7 @@ import { stringify } from 'querystring';
 export function activate(context: vscode.ExtensionContext) {
 	let panel = vscode.window.createWebviewPanel(
 		'openPreview',
-		'w1eX preview test',
+		'w1eX preview',
 		vscode.ViewColumn.Two,
 		{enableScripts: true}
 	);
@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const reOpenView = vscode.commands.registerCommand('w1eX.reopenView', async () => {
 		panel = vscode.window.createWebviewPanel(
 			'openPreview',
-			'w1eX preview test',
+			'w1eX preview',
 			vscode.ViewColumn.Two,
 			{enableScripts: true}
 		);
@@ -77,11 +77,11 @@ export function activate(context: vscode.ExtensionContext) {
 	let reOpenPanel = false;
 
 	const didChange = vscode.workspace.onDidSaveTextDocument(event => {
-		if(/\.w1ex$/.test(event.uri.path)) {
+		if(/\.w1e(x|X)$/.test(event.uri.path)) {
 			if(reOpenPanel) {
 				panel = vscode.window.createWebviewPanel(
 					'openPreview',
-					'w1eX preview test',
+					'w1eX preview',
 					vscode.ViewColumn.Two,
 					{enableScripts: true}
 				);
