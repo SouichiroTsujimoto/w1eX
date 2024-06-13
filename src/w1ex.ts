@@ -28,6 +28,46 @@ async function saveFile(data: string, outpath: string): Promise<void> {
 let count = 0;
 let mathLabels: { [key: string]: string; } = {};
 
+let operationPriority: {[key: string]: number;} = {
+    "+": 1,
+    "-": 1,
+    "*": 2,
+    "/": 2,
+}
+let operateStack: string[] = [];
+function pushOperate(op: string): string[] {
+    if(operateStack.length == 0 || op == "("){
+        operateStack.push(op);
+        return [];
+    }else if(op == ")"){
+        let last = operateStack.pop();
+        last = last ? last : "";
+        let result: string[] = [];
+        
+        if(last != "("){
+            result.push(last);
+            result = result.concat(pushOperate(op));
+        }
+        return result;
+    }else{
+        let pri = operationPriority[op];
+        let last = operateStack.pop();
+        last = last ? last : "";
+        let lp = operationPriority[last];
+        let result: string[] = [];
+
+        if(pri < lp){
+            result.push(last);
+            result = result.concat(pushOperate(op));
+        }else{
+            operateStack.push(last);
+            operateStack.push(op);   
+        }
+
+        return result;
+    }
+}
+
 // パーサーの定義
 const parser = P.createLanguage({
     Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
@@ -107,7 +147,7 @@ const parser = P.createLanguage({
         P.regexp(/\s*\[\s*/),
         r.w1eXMathExpression,
         P.regexp(/\s*\]\s*/),
-    ).map(([lb, content, rb]) => `\n<math>${content}</math>\n`),
+    ).map(([lb, content, rb]) => `\n${content}\n`),
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Text.many().tieWith(""),
@@ -143,26 +183,45 @@ const parser = P.createLanguage({
         }
         return `${content}`
     }),
-    w1eXMathExpression: (r) => P.seq(
-        r.Number,
-        P.alt(
-            r.DivideExpression,
-            r.MultiExpression,
-        ),
-        P.alt(
-            r.w1eXMathExpression,
-            r.Number,
-        ),
-    ).map(([child, op, parent]) => {
-        if(op.trim() == "/"){
-            return `<mfrac><mn>${child}</mn><mrow><mn>${parent}</mn></mrow></mfrac>`
+    w1eXMathExpression: (r) => r.w1eXMathExpressionReversePolish.many().tieWith(""),
+    w1eXMathExpressionReversePolish: (r) => P.alt(
+        r.Operand,
+        r.MultiExpression,
+        r.DivideExpression,
+        r.PlusExpression,
+        r.MinusExpression,
+        r.OpenParenSymbol,
+        r.CloseParenSymbol,
+        P.regexp(/\s+/),
+    ).map((i) => {
+        if(i.trim() == ""){
+            return ""; 
+        }else if(i == "(" || i == ")" || i in operationPriority){
+            return pushOperate(i).join(" ");
         }else {
-            return `<mn>${child}</mn><mo>&times;</mo><mn>${parent}</mn>`
+            return i;
         }
-    }), // 工事中
-    DivideExpression: (r) => P.regexp(/\s*\/\s*/),
-    MultiExpression: (r) => P.regexp(/\s*\*\s*/),
+    }),
+    // .map(([operand1, operate]) => {
+    //     if(operate[0].trim() == "/"){
+    //         return `<mfrac><mn>${operand1}</mn><mrow><mn>${operate[1]}</mn></mrow></mfrac>`
+    //     }else if(operate[0].trim() == "*") {
+    //         return `<mn>${operand1}</mn><mo>&times;</mo><mn>${operate[1]}</mn>`
+    //     }else if(operate[0].trim() == "+") {
+    //         return `<mn>${operand1}</mn><mo>+</mo><mn>${operate[1]}</mn>`
+    //     }else if(operate[0].trim() == "-") {
+    //         return `<mn>${operand1}</mn><mo>-</mo><mn>${operate[1]}</mn>`
+    //     }
+    // }), // 工事中
+    DivideOperation: () => P.regexp(/\//),
+    MultiOperation: () => P.regexp(/\*/),
+    PlusOperation: () => P.regexp(/\+/),
+    MinusOperation: () => P.regexp(/\-/),
+    OpenParenSymbol: () => P.string("("),
+    CloseParenSymbol: () => P.string(")"),
     Number: () => P.regexp(/[0-9]+/),
+    Symbol: () => P.regexp(/[a-zA-z\_]+/),
+    Operand: (r) => P.alt(r.Number, r.Symbol),
 });
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
