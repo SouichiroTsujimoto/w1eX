@@ -202,8 +202,6 @@ const parser = P.createLanguage({
         let numberCheck = /[0-9]+(\.[0-9]+)?/
         polish_exp.push(operateStack.reverse());
         operateStackReset();
-        console.log("-------------------");
-        console.log(Object(polish_exp));
         for(let i of polish_exp){
             if(i.length == 0 || i[0] == ""){
                 continue;
