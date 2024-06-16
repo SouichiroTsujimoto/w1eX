@@ -90,7 +90,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),
+        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),
     ExpBox: (r) => P.seq(
         P.regexp(/\!exp\s*\:?/),
         P.regexp(/[^\{\:]*/),
@@ -99,7 +99,7 @@ const parser = P.createLanguage({
         r.CurlyBracesTexts,
         // r.CurlyBracesTexts, // できれば任意にしたい
     ).map(([exp, name, colon, id, content1]) =>
-        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題</span> ${name.trim()} ${id.trim()}</b><br><br>${content1}<br></div>`),
+        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題</span> ${id.trim()} ${name.trim()}</b><br><br>${content1}<br></div>`),
     FoldBox: (r) => P.seq(
         P.regexp(/\!fold\s*/),
         P.regexp(/[^\{\:]*/),
@@ -107,7 +107,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<details><summary>${name.trim()}</summary><br>${content}</details>`),
+        `<details${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><summary><b> ${id.trim()} ${name.trim()}</b></summary><br>${content}</details>`),
     TheBox: (r) => P.seq(
         P.regexp(/\!the\s*/),
         P.regexp(/[^\{\:]*/),
@@ -115,7 +115,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="TheBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="TheMarker">定理</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),
+        `<div class="TheBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="TheMarker">定理</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),
     ProBox: (r) => P.seq(
         P.regexp(/\!pro\s*/),
         P.regexp(/[^\{\:]*/),
@@ -123,7 +123,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="ProBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ProMarker">命題</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+        `<div class="ProBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ProMarker">命題</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),    
     LemBox: (r) => P.seq(
         P.regexp(/\!lem\s*/),
         P.regexp(/[^\{\:]*/),
@@ -131,7 +131,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="LemBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="LemMarker">補題</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+        `<div class="LemBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="LemMarker">補題</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),    
     AxiBox: (r) => P.seq(
         P.regexp(/\!axi\s*/),
         P.regexp(/[^\{\:]*/),
@@ -139,7 +139,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="AxiBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="AxiMarker">公理</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+        `<div class="AxiBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="AxiMarker">公理</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),    
     CorBox: (r) => P.seq(
         P.regexp(/\!cor\s*/),
         P.regexp(/[^\{\:]*/),
@@ -147,7 +147,7 @@ const parser = P.createLanguage({
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
     ).map(([def, name, colon, id, content]) =>
-        `<div class="CorBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="CorMarker">系</span> ${name.trim()} ${id.trim()}</b><br><br>${content}</div>`),    
+        `<div class="CorBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="CorMarker">系</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),    
     SharpExpression: (r) => P.seq(
         P.regexp(/\#\s*/),
         P.regexp(/[^\{\:]*/),
@@ -157,7 +157,7 @@ const parser = P.createLanguage({
     ).map(([start, title, colon, id, cbsentence]) =>
         `<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}>${id.trim()!="" ? id.trim() + " " : ""} ${title}</b>${cbsentence}`),
     BracesSentence: (r) => P.seq(
-        P.regexp(/\s*\[\s*/),
+        P.regexp(/\[\s*/),
         r.w1eXMathExpression,
         P.string(']'),
     ).map(([lb, content, rb]) => `\n${content}\n`),
@@ -229,7 +229,7 @@ const parser = P.createLanguage({
                         let opLeft = stack.pop();
                         opRight = opRight ? opRight : ["", ""];
                         opLeft = opLeft ? opLeft : ["", ""];
-                        stack.push([`<mfrac>${opLeft[0]}<mrow>${opRight[0]}</mrow></mfrac>`, "number"]);
+                        stack.push([`<mfrac><mrow>${opLeft[0]}</mrow><mrow>${opRight[0]}</mrow></mfrac>`, "number"]);
                     }else if(j == "+"){
                         let opRight = stack.pop();
                         let opLeft = stack.pop();
