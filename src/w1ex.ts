@@ -37,7 +37,7 @@ const parser = P.createLanguage({
         P.string('@'),
         P.regexp(/[^\s]+/),
     ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
-    ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox, r.TheBox, r.ProBox, r.LemBox, r.AxiBox, r.CorBox), 
+    ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox, r.TheBox, r.ProBox, r.LemBox, r.AxiBox, r.CorBox, r.FoldBox), 
     DefBox: (r) => P.seq(
         P.regexp(/\!def\s*/),
         P.regexp(/[^\{\:]*/),
@@ -52,9 +52,17 @@ const parser = P.createLanguage({
         P.regexp(/\:?/),
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
-        r.CurlyBracesTexts, // できれば任意にしたい
-    ).map(([exp, name, colon, id, content1, content2]) =>
-        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題</span> ${name.trim()} ${id.trim()}</b><br><br>${content1}<br><details><summary>解答</summary>${content2}</details></div>`),
+        // r.CurlyBracesTexts, // できれば任意にしたい
+    ).map(([exp, name, colon, id, content1]) =>
+        `<div class="ExpBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="ExpMarker">例題</span> ${name.trim()} ${id.trim()}</b><br><br>${content1}<br></div>`),
+    FoldBox: (r) => P.seq(
+        P.regexp(/\!fold\s*/),
+        P.regexp(/[^\{\:]*/),
+        P.regexp(/\:?/),
+        P.regexp(/[^\{]*/),
+        r.CurlyBracesTexts,
+    ).map(([def, name, colon, id, content]) =>
+        `<details><summary>${name.trim()}</summary><br>${content}</details>`),
     TheBox: (r) => P.seq(
         P.regexp(/\!the\s*/),
         P.regexp(/[^\{\:]*/),
