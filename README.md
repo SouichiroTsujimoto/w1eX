@@ -21,6 +21,8 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 
 ## 文法
 
+⚠️ __!expの文法が変更され、折りたたみboxを使用する場合はbox内で!foldを利用することになりました。具体例は`/sample`などをご覧ください__
+
 ### 章
 ```
 # 商の名前 : 1. {
@@ -31,7 +33,9 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 ### 定義、定理、命題、補題、公理、系
 ```
 !def {
-    数式は$[\LaTeX] : latex で記述できます
+    数式は、
+    $[\LaTeX] : latex で記述できます
+    [1 + 2 * 4 - 1 / ((3 + 2) * 5)] : 四則演算をそのまま記述できます
 }
 !the : 1.2 {
     ラベルを利用することで、登録した$(latex)の式を再利用できます
@@ -44,14 +48,18 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 }
 !axi {
     ...
+    !fold {
+
+    }
 }
 !cor {
     ...
 }
 !exp {
     ...
-}{
-    ...
+    !fold 解答 {
+
+    }
 }
 ```
 
@@ -90,6 +98,6 @@ $( label )
 + PDF出力の実装
 + Meta情報の付与
 + LSPを用意して.w1exファイルの色付け
-+ 自動ナンバリング
++ 自動ナンバリング (意外と大変そう)
 + エラー部分とそれ以外の切り離し
 + エスケープ文字
