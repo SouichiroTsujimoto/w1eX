@@ -28,6 +28,51 @@ async function saveFile(data: string, outpath: string): Promise<void> {
 let count = 0;
 let mathLabels: { [key: string]: string; } = {};
 
+let operationPriority: {[key: string]: number;} = {
+    "+": 1,
+    "-": 1,
+    "*": 2,
+    "/": 2,
+}
+let operateStack: string[] = [];
+
+function operateStackReset() {
+    operateStack = [];
+}
+
+function pushOperate(op: string): string[] {
+    if(operateStack.length == 0 || op == "("){
+        operateStack.push(op);
+        return [];
+    }else if(op == ")"){
+        let last = operateStack.pop();
+        last = last ? last : "";
+        let result: string[] = [];
+        
+        if(last != "("){
+            result.push(last);
+            result = result.concat(pushOperate(op));
+        }
+        return result;
+    }else{
+        let pri = operationPriority[op];
+        let last = operateStack.pop();
+        last = last ? last : "";
+        let lp = operationPriority[last];
+        let result: string[] = [];
+
+        if(pri <= lp){
+            result.push(last);
+            result = result.concat(pushOperate(op));
+        }else{
+            operateStack.push(last);
+            operateStack.push(op);   
+        }
+
+        return result;
+    }
+}
+
 // パーサーの定義
 const parser = P.createLanguage({
     Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
@@ -114,8 +159,8 @@ const parser = P.createLanguage({
     BracesSentence: (r) => P.seq(
         P.regexp(/\s*\[\s*/),
         r.w1eXMathExpression,
-        P.regexp(/\s*\]\s*/),
-    ).map(([lb, content, rb]) => `\n<math>${content}</math>\n`),
+        P.string(']'),
+    ).map(([lb, content, rb]) => `\n${content}\n`),
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
         r.Text.many().tieWith(""),
@@ -151,26 +196,108 @@ const parser = P.createLanguage({
         }
         return `${content}`
     }),
-    w1eXMathExpression: (r) => P.seq(
-        r.Number,
-        P.alt(
-            r.DivideExpression,
-            r.MultiExpression,
-        ),
-        P.alt(
-            r.w1eXMathExpression,
-            r.Number,
-        ),
-    ).map(([child, op, parent]) => {
-        if(op.trim() == "/"){
-            return `<mfrac><mn>${child}</mn><mrow><mn>${parent}</mn></mrow></mfrac>`
-        }else {
-            return `<mn>${child}</mn><mo>&times;</mo><mn>${parent}</mn>`
+    w1eXMathExpression: (r) => r.w1eXMathExpressionReversePolish.many()
+    .map((polish_exp) => {
+        let stack: [string, string][] = [];
+        let numberCheck = /[0-9]+(\.[0-9]+)?/
+        polish_exp.push(operateStack.reverse());
+        operateStackReset();
+        console.log("-------------------");
+        console.log(Object(polish_exp));
+        for(let i of polish_exp){
+            if(i.length == 0 || i[0] == ""){
+                continue;
+            }
+            for(let j of i){
+                if(operationPriority.hasOwnProperty(j)){
+                    if(j == "*"){
+                        let opRight = stack.pop();
+                        let opLeft = stack.pop();
+                        opRight = opRight ? opRight : ["", ""];
+                        opLeft = opLeft ? opLeft : ["", ""];
+                        if(opRight[1]=="pm") {
+                            opRight = [`<mo>(</mo>${opRight[0]}<mo>)</mo>`, "ident"]
+                        }
+                        if(opLeft[1]=="pm") {
+                            opLeft = [`<mo>(</mo>${opLeft[0]}<mo>)</mo>`, "ident"]
+                        }
+                        if(opRight[1]=="number"){
+                            stack.push([`${opLeft[0]}<mo>&times;</mo>${opRight[0]}`, "number"]);
+                        }else{
+                            stack.push([`${opLeft[0]}<mo>&InvisibleTimes;</mo>${opRight[0]}`, "ident"]);
+                        }
+                    }else if(j == "/"){
+                        let opRight = stack.pop();
+                        let opLeft = stack.pop();
+                        opRight = opRight ? opRight : ["", ""];
+                        opLeft = opLeft ? opLeft : ["", ""];
+                        stack.push([`<mfrac>${opLeft[0]}<mrow>${opRight[0]}</mrow></mfrac>`, "number"]);
+                    }else if(j == "+"){
+                        let opRight = stack.pop();
+                        let opLeft = stack.pop();
+                        opRight = opRight ? opRight : ["", ""];
+                        opLeft = opLeft ? opLeft : ["", ""];
+                        stack.push([`${opLeft[0]}<mo>+</mo>${opRight[0]}`, "pm"]);
+                    }else if(j == "-"){
+                        let opRight = stack.pop();
+                        let opLeft = stack.pop();
+                        opRight = opRight ? opRight : ["", ""];
+                        opLeft = opLeft ? opLeft : ["", ""];
+                        if(opRight[1]=="pm") {
+                            opRight = [`<mo>(</mo>${opRight[0]}<mo>)</mo>`, "ident"]
+                        }
+                        stack.push([`${opLeft[0]}<mo>-</mo>${opRight[0]}`, "pm"]);
+                    }
+                }else{
+                    if(numberCheck.test(j)){
+                        stack.push([`<mn>${j}</mn>`, "number"]);
+                    }else{
+                        stack.push([`<mi>${j}</mi>`, "ident"]);
+                    }
+                }
+            }
         }
-    }), // 工事中
-    DivideExpression: (r) => P.regexp(/\s*\/\s*/),
-    MultiExpression: (r) => P.regexp(/\s*\*\s*/),
-    Number: () => P.regexp(/[0-9]+/),
+        console.log(Object(stack));
+        return `<math>${stack[0][0]}</math>`;
+    }),
+    w1eXMathExpressionReversePolish: (r) => P.alt(
+        r.Operand,
+        r.MultiOperation,
+        r.DivideOperation,
+        r.PlusOperation,
+        r.MinusOperation,
+        r.OpenParenSymbol,
+        r.CloseParenSymbol,
+        P.regexp(/\s+/),
+    ).map((i) => {
+        if(i.trim() == ""){
+            return [""]; 
+        }else if(i == "(" || i == ")" || operationPriority.hasOwnProperty(i)){
+            return pushOperate(i);
+        }else {
+            return [i];
+        }
+    }),
+    // .map(([operand1, operate]) => {
+    //     if(operate[0].trim() == "/"){
+    //         return `<mfrac><mn>${operand1}</mn><mrow><mn>${operate[1]}</mn></mrow></mfrac>`
+    //     }else if(operate[0].trim() == "*") {
+    //         return `<mn>${operand1}</mn><mo>&times;</mo><mn>${operate[1]}</mn>`
+    //     }else if(operate[0].trim() == "+") {
+    //         return `<mn>${operand1}</mn><mo>+</mo><mn>${operate[1]}</mn>`
+    //     }else if(operate[0].trim() == "-") {
+    //         return `<mn>${operand1}</mn><mo>-</mo><mn>${operate[1]}</mn>`
+    //     }
+    // }), // 工事中
+    DivideOperation: () => P.regexp(/\//),
+    MultiOperation: () => P.regexp(/\*/),
+    PlusOperation: () => P.regexp(/\+/),
+    MinusOperation: () => P.regexp(/\-/),
+    OpenParenSymbol: () => P.string("("),
+    CloseParenSymbol: () => P.string(")"),
+    Number: () => P.regexp(/[0-9]+(\.[0-9]+)?/),
+    Symbol: () => P.regexp(/\w+/),
+    Operand: (r) => P.alt(r.Number, r.Symbol),
 });
 
 // 文字列中の全ての`$[...]`を`\(...\)`に変換する関数
@@ -194,7 +321,7 @@ export async function compile(filepath: string): Promise<string> {
     
         let data = `
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" lang="en">
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
 body{
