@@ -30,12 +30,10 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 }
 ```
 
-### 定義、定理、命題、補題、公理、系
+### 定義、定理、命題、補題、公理、系、例題
 ```
 !def {
-    数式は、
-    $[\LaTeX] : latex で記述できます
-    [1 + 2 * 4 - 1 / ((3 + 2) * 5)] : 四則演算をそのまま記述できます
+    ここに定義を書く
 }
 !the : 1.2 {
     ラベルを利用することで、登録した$(latex)の式を再利用できます
@@ -49,7 +47,7 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 !axi {
     ...
     !fold {
-
+        ここに書いた内容は折りたたまれます
     }
 }
 !cor {
@@ -64,17 +62,6 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 ```
 
 
-### 例題
-後半の{ }内は解答
-```
-!exp {
-    ...
-} {
-    ...
-}
-```
-
-
 ### アンカー
 指定したidの場所にジャンプ(例 !def _ : 1.2.3 {...} に飛ぶ)
 ```
@@ -83,11 +70,14 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 
 ### 数式
 LaTeXの記法で表現(MathJax)
+または角括弧内に四則演算をそのまま記入
 ```
 $[\LaTeX]
 $[\frac{1}{\LaTeX}] : label
 
 $( label )
+
+[(1/2+3) * (4+2)/3*4*a]
 ```
 
 
