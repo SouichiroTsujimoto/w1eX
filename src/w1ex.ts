@@ -163,7 +163,7 @@ const parser = P.createLanguage({
     BracesSentence: (r) => P.seq(
         P.regexp(/\[\s*/),
         r.w1eXMathExpression,
-        P.string(']'),
+        P.regexp(/\]/),
     ).map(([lb, content, rb]) => `\n${content}\n`),
     CurlyBracesTexts: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
@@ -178,8 +178,8 @@ const parser = P.createLanguage({
     DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
     MathExpression: () => P.seq(
         P.regexp(/\$\s*\[\s*/),
-        P.regexp(/[^\]]*/),
-        P.string(']'),
+        P.regexp(/(\\\]|[^\]])*/),
+        P.regexp(/\]/),
         P.regexp(/(\s*\:\s*[^\s]+)?/),
     ).map(([start, content, end, id]) => {
         if(id != ""){
