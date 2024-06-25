@@ -76,8 +76,12 @@ function pushOperate(op: string): string[] {
 // パーサーの定義
 const parser = P.createLanguage({
     Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
-    Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\[\]]+/), r.BracesSentence, r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
+    Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\[\]\\]+/), r.BracesSentence, r.EscapeSequence, r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
     NewLine: () => P.regexp(/[\n\r]/).map((nr) => '<br>\n'),
+    EscapeSequence: () => P.seq(
+        P.string("\\"),
+        P.regexp(/./),
+    ).map(([escape, char]) => char),
     AtSignExpression: () => P.seq(
         P.string('@'),
         P.regexp(/[^\s]+/),
