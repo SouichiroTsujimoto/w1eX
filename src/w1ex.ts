@@ -75,9 +75,19 @@ function pushOperate(op: string): string[] {
 
 // パーサーの定義
 const parser = P.createLanguage({
-    Sentence: (r) => P.alt(r.SharpExpression, r.Text).many().tieWith(""),
-    Text: (r) => P.alt(P.regex(/[^\$\#\n\r\!@\}\[\]\\]+/), r.BracesSentence, r.EscapeSequence, r.AtSignExpression, r.DollarExpression, r.ExclamationExpression, r.NewLine), 
-    NewLine: () => P.regexp(/[\n\r]/).map((nr) => '<br>\n'),
+    Sentence: (r) => r.Text.many().tieWith(""),
+    Text: (r) => P.alt(
+        r.SharpExpression, 
+        r.BracesSentence,
+        r.EscapeSequence,
+        r.AtSignExpression,
+        r.DollarExpression,
+        r.ExclamationExpression,
+        r.NewLine,
+        r.BoldText,
+        P.regex(/[^\$\#\n\r\!@\}\[\]\\\_]+/),
+    ), 
+    NewLine: () => P.regexp(/\n\r|\n|\r/).map((nr) => '<br>\n'),
     EscapeSequence: () => P.seq(
         P.string("\\"),
         P.regexp(/./),
@@ -172,9 +182,14 @@ const parser = P.createLanguage({
     ).map(([lc, content, rc]) => `\n${content}\n`),
     CurlyBracesSentence: (r) => P.seq(
         P.regexp(/\s*\{\s*/),
-        r.Sentence,
+        r.Text.many().tieWith(""),
         P.regexp(/\s*\}/),
     ).map(([lc, content, rc]) => `<div class="section">\n${content}\n</div>`),
+    BoldText: (r) => P.seq(
+        P.string("_"),
+        P.regexp(/[^\_]*/),
+        P.string("_"),
+    ).map(([underbar1, text, underbar2]) => `<b>${text}</b>`),
     DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
     MathExpression: () => P.seq(
         P.regexp(/\$\s*\[\s*/),
