@@ -1,0 +1,91 @@
+{
+"scopeName": "source.w1eX",
+"patterns": [{ "include": "#expression" }],
+"repository": {
+    "expression": {
+        "patterns": [
+            { "include": "#section" },
+            { "include": "#box" },
+            { "include": "#latex" },
+            { "include": "#math" },
+            { "include": "#at" },
+            { "include": "#label" }
+        ]
+    },
+    "section": {
+        "match": "(#)\\s*([^\\s]+)",
+        "captures": {
+            "1": {
+                "name": "storage.type"
+            },
+            "2": {
+                "name": "variable.parameter"
+            }
+        }
+    },
+    "box": {
+        "patterns": [
+            {
+                "match": "(!def|!exp|!the|!pro|!axi|!cor|!lem|!fold)\\s*([^\\:\\{]*):?\\s*([^\\s\\{]*)",
+                "captures": {
+                    "1": {
+                        "name": "variable.language"
+                    },
+                    "2": {
+                        "name": "variable.parameter"
+                    },
+                    "3": {
+                        "name": "constant.numeric"
+                    }
+                }
+            }
+        ]
+    },
+    "latex": {
+        "begin": "\\$\\s*\\[",
+        "end": "\\]",
+        "patterns": [
+            {
+                "name": "keyword.language",
+                "match": "\\\\[^\\s]+"
+            },
+            {
+                "name": "keyword.operator",
+                "match": "\\+|\\-|\\*|\\/"
+            },
+            {
+                "name": "constant.character",
+                "match": "."
+            }
+        ],
+        "name": "string.quoted"
+    },
+    "math": {
+        "begin": "\\[",
+        "end": "\\]",
+        "patterns": [
+            {
+                "name": "keyword.operator",
+                "match": "\\+|\\-|\\*|\\/"
+            },
+            {
+                "name": "constant.character",
+                "match": "."
+            }
+        ],
+        "name": "string.quoted"
+    },
+    "at": {
+        "match": "@[^\\s]+",
+        "name": "constant.other"
+    },
+    "label": {
+        "match": ":\\s*([^\\s]*)",
+        "captures": {
+            "1": {
+                "name": "constant.numeric"
+            }
+        }
+    }
+}
+}
