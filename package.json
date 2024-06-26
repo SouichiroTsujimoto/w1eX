@@ -22,12 +22,12 @@
     "commands": [
       {
         "command": "w1eX.compile",
-        "title": "create html file",
+        "title": "compile to html",
         "category": "w1eX"
       },
       {
-        "command": "w1eX.reopenView",
-        "title": "reopen html view",
+        "command": "w1eX.openView",
+        "title": "open html view",
         "category": "w1eX"
       }
     ]

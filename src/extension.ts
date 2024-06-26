@@ -2,20 +2,28 @@ import * as vscode from 'vscode';
 import {compile} from './w1ex';
 import { stringify } from 'querystring';
 
-export function activate(context: vscode.ExtensionContext) {
-	let panel = vscode.window.createWebviewPanel(
-		'openPreview',
-		'w1eX preview',
-		vscode.ViewColumn.Two,
-		{enableScripts: true}
-	);
+let panel: vscode.WebviewPanel;
+//  = vscode.window.createWebviewPanel(
+// 	'openPreview',
+// 	'w1eX preview',
+// 	vscode.ViewColumn.Two,
+// 	{enableScripts: true}
+// );
 
-	const reOpenView = vscode.commands.registerCommand('w1eX.reopenView', async () => {
+export function activate(context: vscode.ExtensionContext) {
+	const reOpenView = vscode.commands.registerCommand('w1eX.openView', async () => {
 		panel = vscode.window.createWebviewPanel(
 			'openPreview',
 			'w1eX preview',
 			vscode.ViewColumn.Two,
 			{enableScripts: true}
+		);
+		panel.onDidDispose(
+			() => {
+				reOpenPanel = true;
+			},
+			null,
+			context.subscriptions
 		);
 	});
 
@@ -74,18 +82,25 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(reOpenView, w1eXCompile);
 
-	let reOpenPanel = false;
+	let reOpenPanel = true;
 
 	const didChange = vscode.workspace.onDidSaveTextDocument(event => {
 		if(/\.w1e(x|X)$/.test(event.uri.path)) {
 			if(reOpenPanel) {
+				reOpenPanel = false;
 				panel = vscode.window.createWebviewPanel(
 					'openPreview',
 					'w1eX preview',
 					vscode.ViewColumn.Two,
 					{enableScripts: true}
 				);
-				reOpenPanel = false;
+				panel.onDidDispose(
+					() => {
+						reOpenPanel = true;
+					},
+					null,
+					context.subscriptions
+				);
 			}
 			
 			// vscode.window.showInformationMessage(event.uri.path);
@@ -99,14 +114,6 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 		}
 	});
-
-	panel.onDidDispose(
-		() => {
-			reOpenPanel = true;
-		},
-		null,
-        context.subscriptions
-	);
 }
 
 
