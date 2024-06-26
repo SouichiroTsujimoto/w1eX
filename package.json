@@ -2,7 +2,7 @@
   "name": "w1ex",
   "displayName": "w1eX",
   "description": "",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.80.0"
   },
