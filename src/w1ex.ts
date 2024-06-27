@@ -197,10 +197,15 @@ const parser = P.createLanguage({
         P.regexp(/\]/),
         P.regexp(/(\s*\:\s*[^\s]+)?/),
     ).map(([start, content, end, id]) => {
+        let escaping = content
+            .replaceAll("(", "&lpar;")
+            .replaceAll(")", "&rpar;")
+            .replaceAll("\\[", "&lbrack;")
+            .replaceAll("\\]", "&rbrack;");
         if(id != ""){
-            mathLabels[id.trim().slice(1).trim()] = `\\(${content}\\)`;
+            mathLabels[id.trim().slice(1).trim()] = `\\(${escaping}\\)`;
         }
-        return `\\(${content}\\)`;
+        return `\\(${escaping}\\)`;
     }),
     MathLabel: (r) => P.seq(
         P.regexp(/\$\s*\(\s*/),

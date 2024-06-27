@@ -13,7 +13,7 @@
         ]
     },
     "section": {
-        "match": "(#)\\s*([^\\s]+)",
+        "match": "(#)\\s*([^\\s\\{]*)",
         "captures": {
             "1": {
                 "name": "storage.type"
@@ -42,23 +42,27 @@
         ]
     },
     "latex": {
-        "begin": "\\$\\s*\\[",
+        "begin": "(\\$)\\s*\\[",
+        "beginCaptures": {
+            "1": {
+                "name": "string.quoted"
+            }
+        },
         "end": "\\]",
         "patterns": [
-            {
-                "name": "keyword.language",
-                "match": "\\\\[^\\s]+"
-            },
             {
                 "name": "keyword.operator",
                 "match": "\\+|\\-|\\*|\\/"
             },
             {
+                "name": "keyword.control",
+                "match": "\\\\."
+            },
+            {
                 "name": "constant.character",
                 "match": "."
             }
-        ],
-        "name": "string.quoted"
+        ]
     },
     "math": {
         "begin": "\\[",
@@ -69,18 +73,21 @@
                 "match": "\\+|\\-|\\*|\\/"
             },
             {
+                "name": "keyword.control",
+                "match": "\\\\."
+            },
+            {
                 "name": "constant.character",
                 "match": "."
             }
-        ],
-        "name": "string.quoted"
+        ]
     },
     "at": {
         "match": "@[^\\s]+",
         "name": "constant.other"
     },
     "label": {
-        "match": ":\\s*([^\\s]*)",
+        "match": ":\\s*([^\\s\\{]*)",
         "captures": {
             "1": {
                 "name": "constant.numeric"
