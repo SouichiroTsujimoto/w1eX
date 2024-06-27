@@ -84,8 +84,8 @@ const parser = P.createLanguage({
         r.DollarExpression,
         r.ExclamationExpression,
         r.NewLine,
-        r.BoldText,
-        P.regex(/[^\$\#\n\r\!@\}\[\]\\\_]+/),
+        r.DecorationText,
+        P.regex(/[^\$\#\n\r\!@\}\[\]\\\_\*\/]+/),
     ), 
     NewLine: () => P.regexp(/\n\r|\n|\r/).map((nr) => '<br>\n'),
     EscapeSequence: () => P.seq(
@@ -185,11 +185,35 @@ const parser = P.createLanguage({
         r.Text.many().tieWith(""),
         P.regexp(/\s*\}/),
     ).map(([lc, content, rc]) => `<div class="section">\n${content}\n</div>`),
-    BoldText: (r) => P.seq(
+    DecorationText: (r) => P.alt(
+        r.Italic,
+        r.Bold,
+        r.UnderLine,
+    ),
+    Italic: (r) => P.seq(
+        P.string("/"),
+        P.alt(
+            r.DecorationText,
+            P.regex(/[^\_\*\/]+/),
+        ).many().tieWith(""),
+        P.string("/"),
+    ).map(([sign1, text, sign2]) => `<span style="font-style: italic">${text}</span>`),
+    Bold: (r) => P.seq(
+        P.string("*"),
+        P.alt(
+            r.DecorationText,
+            P.regex(/[^\_\*\/]+/),
+        ).many().tieWith(""),
+        P.string("*"),
+    ).map(([sign1, text, sign2]) => `<span style="font-weight: bold">${text}</span>`),
+    UnderLine: (r) => P.seq(
         P.string("_"),
-        P.regexp(/[^\_]*/),
+        P.alt(
+            r.DecorationText,
+            P.regex(/[^\_\*\/]+/),
+        ).many().tieWith(""),
         P.string("_"),
-    ).map(([underbar1, text, underbar2]) => `<b>${text}</b>`),
+    ).map(([sign1, text, sign2]) => `<span style="text-decoration: underline">${text}</span>`),
     DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
     MathExpression: () => P.seq(
         P.regexp(/\$\s*\[\s*/),

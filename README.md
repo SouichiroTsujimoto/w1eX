@@ -28,8 +28,8 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 ```
 # 商の名前 : 1. {
     ここに_文章_を記述
-    \_で囲った部分は太字になります
-    (この太字を表す文法は今後変更される可能性があります)
+    この文章は_下線_、*太字*、/イタリック体/を含みます
+    _これらを/*重ねて*使うこと/_もできます
 }
 ```
 
