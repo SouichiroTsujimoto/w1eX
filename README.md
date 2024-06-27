@@ -27,7 +27,9 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 ### 章
 ```
 # 商の名前 : 1. {
-    ここに文章を記述
+    ここに_文章_を記述
+    \_で囲った部分は太字になります
+    (この太字を表す文法は今後変更される可能性があります)
 }
 ```
 
