@@ -193,24 +193,21 @@ const parser = P.createLanguage({
     Italic: (r) => P.seq(
         P.string("/"),
         P.alt(
-            r.DecorationText,
-            P.regex(/[^\_\*\/]+/),
+            P.regex(/[^\/]+/),
         ).many().tieWith(""),
         P.string("/"),
     ).map(([sign1, text, sign2]) => `<span style="font-style: italic">${text}</span>`),
     Bold: (r) => P.seq(
         P.string("*"),
         P.alt(
-            r.DecorationText,
-            P.regex(/[^\_\*\/]+/),
+            P.regex(/[^\*]+/),
         ).many().tieWith(""),
         P.string("*"),
     ).map(([sign1, text, sign2]) => `<span style="font-weight: bold">${text}</span>`),
     UnderLine: (r) => P.seq(
         P.string("_"),
         P.alt(
-            r.DecorationText,
-            P.regex(/[^\_\*\/]+/),
+            P.regex(/[^\_]+/),
         ).many().tieWith(""),
         P.string("_"),
     ).map(([sign1, text, sign2]) => `<span style="text-decoration: underline">${text}</span>`),

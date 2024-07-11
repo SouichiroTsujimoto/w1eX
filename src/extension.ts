@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import {compile} from './w1ex';
 import { stringify } from 'querystring';
 
-let panel: vscode.WebviewPanel;
 //  = vscode.window.createWebviewPanel(
 // 	'openPreview',
 // 	'w1eX preview',
@@ -11,6 +10,13 @@ let panel: vscode.WebviewPanel;
 // );
 
 export function activate(context: vscode.ExtensionContext) {
+	let panel = vscode.window.createWebviewPanel(
+		'openPreview',
+		'w1eX preview',
+		vscode.ViewColumn.Two,
+		{enableScripts: true}
+	);
+
 	const reOpenView = vscode.commands.registerCommand('w1eX.openView', async () => {
 		panel = vscode.window.createWebviewPanel(
 			'openPreview',
