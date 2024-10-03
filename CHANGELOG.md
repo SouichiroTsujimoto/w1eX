@@ -7,3 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Initial release
+
+## [0.0.13]
+- 画像を表示する&[]記法を追加
+- vscode webviewの設定の修正

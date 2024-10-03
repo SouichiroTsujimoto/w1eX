@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {compile} from './w1ex';
-import { stringify } from 'querystring';
+import * as path from 'path';
 
 //  = vscode.window.createWebviewPanel(
 // 	'openPreview',
@@ -9,20 +9,27 @@ import { stringify } from 'querystring';
 // 	{enableScripts: true}
 // );
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+	
 	let panel = vscode.window.createWebviewPanel(
 		'openPreview',
-		'w1eX preview',
+		'w1eX',
 		vscode.ViewColumn.Two,
-		{enableScripts: true}
+		{
+			enableScripts: true,
+			localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+		}
 	);
 
 	const reOpenView = vscode.commands.registerCommand('w1eX.openView', async () => {
 		panel = vscode.window.createWebviewPanel(
 			'openPreview',
-			'w1eX preview',
+			'w1eX',
 			vscode.ViewColumn.Two,
-			{enableScripts: true}
+			{
+				enableScripts: true,
+				localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+			}
 		);
 		panel.onDidDispose(
 			() => {
@@ -75,14 +82,19 @@ export function activate(context: vscode.ExtensionContext) {
 		// const blob: Uint8Array = Buffer.from(content);
 
 		// ファイル書き込み
-		compile(filePath[0].fsPath).then(html => {
-			console.log(html);
-			vscode.workspace.fs.writeFile(outputPath, Buffer.from(html));
-			vscode.window.showInformationMessage("compile success");
-		},
-		err => {
-			console.error(err);
-			vscode.window.showErrorMessage("compile fail");
+		compile(filePath[0].fsPath).then(
+			html => {
+				console.log(html);
+				vscode.workspace.fs.writeFile(outputPath, Buffer.from(html));
+				vscode.window.showInformationMessage("compile success");
+			},
+			err => {
+				console.error(err);
+				vscode.window.showErrorMessage(`Compilation failed: ${err.message}`);
+			}
+		).catch(err => {
+			console.error('Unhandled error:', err);
+			vscode.window.showErrorMessage(`Unhandled error: ${err.message}`);
 		});
 	});
 
@@ -98,7 +110,10 @@ export function activate(context: vscode.ExtensionContext) {
 					'openPreview',
 					'w1eX preview',
 					vscode.ViewColumn.Two,
-					{enableScripts: true}
+					{
+						enableScripts: true,
+						localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+					}
 				);
 				panel.onDidDispose(
 					() => {
@@ -112,14 +127,33 @@ export function activate(context: vscode.ExtensionContext) {
 			// vscode.window.showInformationMessage(event.uri.path);
 			compile(event.uri.fsPath).then(
 				html => {
-					panel.webview.html = html;
+					 // HTMLの画像パスを変換
+					const updatedHtml = replaceImagePaths(html, panel.webview, path.dirname(event.uri.fsPath));
+					panel.webview.html = updatedHtml;
 				},
 				err => {
 					console.error(err);
+					vscode.window.showErrorMessage(`Compilation failed: ${err.message}`);
 				}
-			);
+			).catch(err => {
+                console.error('Unhandled error:', err);
+                vscode.window.showErrorMessage(`Unhandled error: ${err.message}`);
+            });
 		}
 	});
+}
+
+function replaceImagePaths(html: string, webview: vscode.Webview, baseDir: string): string {
+    // 画像タグの src 属性を置換
+    return html.replace(
+        /<img\s+src="([^"]+)"/g,
+        (match, src) => {
+            const imagePath = path.join(baseDir, src);
+            const imageUri = vscode.Uri.file(imagePath);
+            const webviewUri = webview.asWebviewUri(imageUri);
+            return `<img src="${webviewUri}"`;
+        }
+    );
 }
 
 

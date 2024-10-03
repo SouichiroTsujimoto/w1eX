@@ -85,7 +85,8 @@ const parser = P.createLanguage({
         r.ExclamationExpression,
         r.NewLine,
         r.DecorationText,
-        P.regex(/[^\$\#\n\r\!@\}\[\]\\\_\*\/]+/),
+        r.Image,
+        P.regex(/[^\$\&\#\n\r\!@\}\[\]\\\_\*\/]+/),
     ), 
     NewLine: () => P.regexp(/\n\r|\n|\r/).map((nr) => '<br>\n'),
     EscapeSequence: () => P.seq(
@@ -96,6 +97,7 @@ const parser = P.createLanguage({
         P.string('@'),
         P.regexp(/[^\s]+/),
     ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
+    //  !記号ボックス
     ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox, r.TheBox, r.ProBox, r.LemBox, r.AxiBox, r.CorBox, r.FoldBox), 
     DefBox: (r) => P.seq(
         P.regexp(/\!def\s*/),
@@ -185,6 +187,7 @@ const parser = P.createLanguage({
         r.Text.many().tieWith(""),
         P.regexp(/\s*\}/),
     ).map(([lc, content, rc]) => `<div class="section">\n${content}\n</div>`),
+    // テキスト装飾
     DecorationText: (r) => P.alt(
         r.Italic,
         r.Bold,
@@ -211,6 +214,15 @@ const parser = P.createLanguage({
         ).many().tieWith(""),
         P.string("_"),
     ).map(([sign1, text, sign2]) => `<span style="text-decoration: underline">${text}</span>`),
+    // &記号(今の所、imageのみ)
+    Image: (r) => P.seq(
+        P.regexp(/\&\s*\[\s*/),
+        P.regexp(/[^\]]*/),
+        P.string(']'),
+    ).map(([lp, url, rp]) => {
+        return `<img src="${url}" />`
+    }),
+    // $記号
     DollarExpression: (r) => P.alt(r.MathExpression, r.MathLabel),
     MathExpression: () => P.seq(
         P.regexp(/\$\s*\[\s*/),

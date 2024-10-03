@@ -2,7 +2,7 @@
   "name": "w1ex",
   "displayName": "w1eX",
   "description": "",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -15,7 +15,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:w1eX"
   ],
   "main": "./out/extension.js",
   "contributes": {
