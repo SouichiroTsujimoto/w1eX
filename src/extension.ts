@@ -17,7 +17,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.ViewColumn.Two,
 		{
 			enableScripts: true,
-			localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+			localResourceRoots: [vscode.workspace.workspaceFolders?.[0].uri || vscode.Uri.file(path.dirname(context.extensionPath))]
 		}
 	);
 
@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.ViewColumn.Two,
 			{
 				enableScripts: true,
-				localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+				localResourceRoots: [vscode.workspace.workspaceFolders?.[0].uri || vscode.Uri.file(path.dirname(context.extensionPath))]
 			}
 		);
 		panel.onDidDispose(
@@ -108,11 +108,11 @@ export async function activate(context: vscode.ExtensionContext) {
 				reOpenPanel = false;
 				panel = vscode.window.createWebviewPanel(
 					'openPreview',
-					'w1eX preview',
+					'w1eX',
 					vscode.ViewColumn.Two,
 					{
 						enableScripts: true,
-						localResourceRoots: [vscode.Uri.file(path.dirname(context.extensionPath))]
+						localResourceRoots: [vscode.workspace.workspaceFolders?.[0].uri || vscode.Uri.file(path.dirname(context.extensionPath))]
 					}
 				);
 				panel.onDidDispose(
@@ -144,11 +144,10 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 function replaceImagePaths(html: string, webview: vscode.Webview, baseDir: string): string {
-    // 画像タグの src 属性を置換
     return html.replace(
         /<img\s+src="([^"]+)"/g,
         (match, src) => {
-            const imagePath = path.join(baseDir, src);
+            const imagePath = path.isAbsolute(src) ? src : path.join(baseDir, src);
             const imageUri = vscode.Uri.file(imagePath);
             const webviewUri = webview.asWebviewUri(imageUri);
             return `<img src="${webviewUri}"`;

@@ -1,23 +1,32 @@
 <mxfile host="65bd71144e">
     <diagram id="qZRGsk6ZV9Pmae3X5Okd" name="ページ1">
-        <mxGraphModel dx="698" dy="391" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="481" dy="270" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="6" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="4">
+                <mxCell id="8" value="&lt;h1&gt;w1eX&lt;/h1&gt;&lt;p&gt;Making beautiful notes!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;w1eX code is compiled into html and display in a vscode webview.&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=#3700CC;fillColor=#6a00ff;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;glass=1;shadow=0;fontColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="140" width="205.83" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="9" target="10">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="w1ex" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="310" y="180" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="8" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="4" target="5">
+                <mxCell id="16" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="9" target="15">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="html" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="470" y="180" width="120" height="60" as="geometry"/>
+                <mxCell id="9" value="w1eX" style="rounded=1;whiteSpace=wrap;html=1;shadow=0;glass=0;sketch=0;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="290" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="vscode webview" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="630" y="180" width="120" height="60" as="geometry"/>
+                <mxCell id="10" value="vscode&lt;br&gt;webview" style="whiteSpace=wrap;html=1;rounded=1;shadow=0;glass=0;sketch=0;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="save" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="465" y="290" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="html file" style="whiteSpace=wrap;html=1;rounded=1;shadow=0;glass=0;sketch=0;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="400" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Ctrl + Shift + P&lt;br&gt;&amp;amp; &quot;w1ex compile&quot; command" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="405" y="360" width="170" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

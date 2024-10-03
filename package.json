@@ -2,7 +2,7 @@
   "name": "w1ex",
   "displayName": "w1eX",
   "description": "",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -43,6 +43,10 @@
         "scopeName": "source.w1eX",
         "path": "./syntaxes/w1eX.tmLanguage.json"
       }
+    ],
+    "workspaceContains": [
+      "**/*.w1ex",
+      "**/*.w1eX"
     ]
   },
   "scripts": {
