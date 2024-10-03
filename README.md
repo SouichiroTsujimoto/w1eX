@@ -4,7 +4,7 @@
 
 具体的な使用例は`/sample`内のファイルを参照してください。
 
-<img width="1449" alt="スクリーンショット 2024-06-07 22 47 20" src="https://github.com/SouichiroTsujimoto/w1eX/assets/40849683/a87409bc-441a-41ff-93df-4efbd1dbdfe7">
+<img width="1183" alt="スクリーンショット 2024-10-03 22 27 30" src="https://github.com/user-attachments/assets/618a449b-bb6f-4a4d-b664-f08e80139ae0">
 
 自分はw1eX(ワイエックス)って呼んでます。好きに呼んでください。
 
