@@ -73,6 +73,60 @@ function pushOperate(op: string): string[] {
     }
 }
 
+type ElementContent = Element | string;
+
+class Element {
+    private option: string[];
+    private content: ElementContent[]; // list of Element or string
+    
+    constructor(
+        private tag: string,
+        option?: string[],
+        content?: ElementContent[], 
+    ){
+        this.option = option ? option : [];
+        this.content = content ? content : [];
+    }
+
+    public getTag(): string {
+        return this.tag;
+    }
+
+    public getOption(): string[] {
+        return this.option;
+    }
+
+    public getContent(): ElementContent[] {
+        return this.content ? this.content : [];
+    }
+
+    public setTag(tag: string): void {
+        this.tag = tag;
+    }
+
+    public setOption(option: string[]): void {
+        this.option = option;
+    }       
+
+    public setContent(content: ElementContent[]): void {
+        this.content = content;
+    }
+    
+    public addContent(content: ElementContent): void {
+        this.content.push(content);
+    }
+
+    public getElement(): string {
+        let result = `<${this.tag}`;
+        for(let i of this.option){
+            result += ` ${i}`;
+        }
+        result += `>${this.content}</${this.tag}>`;
+        return result;
+    }
+}
+
+
 // パーサーの定義
 const parser = P.createLanguage({
     Sentence: (r) => r.Text.many().tieWith(""),
@@ -96,7 +150,7 @@ const parser = P.createLanguage({
     AtSignExpression: () => P.seq(
         P.string('@'),
         P.regexp(/[^\s]+/),
-    ).map(([at, content]) => `<a href=#${content}>${content}</a>`),
+    ).map(([at, content]) => new Element("a", [`href=#${content}`], content) /*`<a href=#${content}>${content}</a>`*/), 
     //  !記号ボックス
     ExclamationExpression: (r) => P.alt(r.DefBox, r.ExpBox, r.TheBox, r.ProBox, r.LemBox, r.AxiBox, r.CorBox, r.FoldBox), 
     DefBox: (r) => P.seq(
@@ -105,8 +159,19 @@ const parser = P.createLanguage({
         P.regexp(/\:?/),
         P.regexp(/[^\{]*/),
         r.CurlyBracesTexts,
-    ).map(([def, name, colon, id, content]) =>
-        `<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`),
+    ).map(([def, name, colon, id, content]) => {
+        // ここがhtml直書き→elementオブジェクトの移行例となる
+        let div = new Element("div", ["class=DefBox"]);
+        let b = new Element("b", [id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""]);
+        let span = new Element("span", ["class=DefMarker"], ["定義"]);
+        b.addContent(span);
+        b.addContent(` ${id.trim()} ${name.trim()}`);
+        div.addContent(b);
+        div.addContent(new Element("br"));
+        div.addContent(new Element("br"));
+        div.addContent(content);
+        return div.getElement(); // return div;
+    }), /*`<div class="DefBox">\n<b${id.trim()!="" ? " id=\"" + id.trim() + "\"" : ""}><span class="DefMarker">定義</span> ${id.trim()} ${name.trim()}</b><br><br>${content}</div>`)*/
     ExpBox: (r) => P.seq(
         P.regexp(/\!exp\s*\:?/),
         P.regexp(/[^\{\:]*/),
