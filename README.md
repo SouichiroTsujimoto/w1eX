@@ -22,8 +22,6 @@ https://marketplace.visualstudio.com/items?itemName=SouichiroTsujimoto.w1ex
 
 ## 文法
 
-⚠️ __!expの文法が変更され、折りたたみboxを使用する場合はbox内で!foldを利用することになりました。具体例は`/sample`などをご覧ください__
-
 ### 章
 ```
 # 商の名前 : 1. {
